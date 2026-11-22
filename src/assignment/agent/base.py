@@ -141,7 +141,6 @@ class Agent:
         self.tools: list[dict[str, Any]] = []
         self.finished = False
         self.steps_taken = 0
-
         self.skills_path = Path(skills_path) if skills_path is not None else None
         self.skills: dict[str, dict[str, str]] = (
             self.load_skills(self.skills_path) if self.skills_path is not None else {}
@@ -152,6 +151,8 @@ class Agent:
 
         # TODO(1.1.a): Add machinery to maintain agent state as it takes actions
         # and observes the results.
+
+        self.history: list[dict[str, Any]] = []
 
     def load_skills(self, skills_path: Path) -> dict[str, dict[str, str]]:
         """Load the skill folders exposed to this agent."""
@@ -227,7 +228,17 @@ class Agent:
 
         # You want to be careful about which attributes of the class you modify
         # here as they may also be handled by the subclasses.
-        raise NotImplementedError
+        messages = []
+        system_prompt = self.system_prompt
+        system_prompt_message = {"role":"system","content":system_prompt}
+        messages.append(system_prompt_message)
+        task_prompt = self.task_prompt
+        task_prompt_message = {"role":"user","content":task_prompt}
+        messages.append(task_prompt_message)
+
+        messages.extend(self.history)
+
+        return messages
 
     def estimate_active_prompt_tokens(self) -> int:
         """Estimate the next prompt, calibrated by the provider's latest usage."""
