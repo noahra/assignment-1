@@ -211,6 +211,7 @@ class Agent:
                 "the loop should preserve the response and continue",
                 flush=True,
             )
+        self.history.append(message)
         return message
 
     def process_response(self, response: Any) -> dict[str, Any]:
