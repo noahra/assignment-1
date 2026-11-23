@@ -64,6 +64,8 @@ def rough_message_tokens(messages: list[dict[str, Any]]) -> int:
     return max(1, math.ceil(len(serialized) / 4))
 
 
+
+
 class Agent:
     """Base class for a ReAct agent with pluggable tools."""
 
@@ -153,6 +155,26 @@ class Agent:
         # and observes the results.
 
         self.history: list[dict[str, Any]] = []
+
+    def format_system_prompt(self) -> str:
+        """Format a system prompt as a compact, tagged model observation."""
+
+        environment = self.env
+
+        environment_map = {"machine":environment.machine,"release":environment.release,
+                           "system":environment.system,
+                           "version":environment.version}
+
+        elements: list[str] = ["<system_information>", "{"]
+        entries: list[str] = []
+        for key in environment_map:
+            value = environment_map[key]
+            value = f"  \"{key}\": {value}"
+            entries.append(value)
+        elements.append(",\n".join(entries))
+        elements.append("}")
+        elements.append("</system_information>")
+        return "\n".join(elements)
 
     def load_skills(self, skills_path: Path) -> dict[str, dict[str, str]]:
         """Load the skill folders exposed to this agent."""
