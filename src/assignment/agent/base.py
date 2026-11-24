@@ -80,8 +80,13 @@ class Agent:
         compact_threshold_tokens: int | None = None,
         compaction_keep_recent_steps: int = DEFAULT_COMPACTION_KEEP_RECENT_STEPS,
         compaction_max_tokens: int = DEFAULT_COMPACTION_MAX_TOKENS,
+        initial_prompt: str | None = None,
+        task_prompt:  str | None = None,
     ):
+
+        self.task_prompt = task_prompt
         self.env = environment
+        self.initial_prompt = initial_prompt
         self.model = model or os.environ.get("OPENAI_MODEL")
         if not self.model:
             raise RuntimeError("OPENAI_MODEL is not set.")
@@ -134,8 +139,8 @@ class Agent:
 
         # Each agent supplies its own opening messages: the standing
         # instructions, and the task statement that starts the run.
-        self.system_prompt: str = ""
-        self.task_prompt: str = ""
+        self.system_prompt: str = self.format_system_prompt()
+
 
         self.api_prompts: list[list[dict[str, Any]]] = []
         self.api_responses: list[dict[str, Any]] = []
@@ -159,13 +164,20 @@ class Agent:
     def format_system_prompt(self) -> str:
         """Format a system prompt as a compact, tagged model observation."""
 
+
         environment = self.env
+        initial_prompt = self.initial_prompt
 
         environment_map = {"machine":environment.machine,"release":environment.release,
                            "system":environment.system,
                            "version":environment.version}
+        elements: list[str] = []
+        if initial_prompt:
+            elements.append(initial_prompt)
 
-        elements: list[str] = ["<system_information>", "{"]
+        elements.append("<system_information>")
+        elements.append("{")
+
         entries: list[str] = []
         for key in environment_map:
             value = environment_map[key]

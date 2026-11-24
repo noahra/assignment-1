@@ -12,6 +12,8 @@ from assignment.agent.base import (
 )
 from assignment.agent.tools import EXECUTE_TOOL, SEND_MESSAGE_TOOL
 from assignment.env import Environment
+from assignment.prompts import CODING_AGENT_SYSTEM_PROMPT_TEMPLATE
+
 
 class CodeAgent(Agent):
     """An agent that fixes a software issue and submits a git patch."""
@@ -39,9 +41,12 @@ class CodeAgent(Agent):
             compact_threshold_tokens=compact_threshold_tokens,
             compaction_keep_recent_steps=compaction_keep_recent_steps,
             compaction_max_tokens=compaction_max_tokens,
+            initial_prompt=CODING_AGENT_SYSTEM_PROMPT_TEMPLATE.render()
         )
         self.task = task
+        self.task_prompt = task
         self.submitted_patch = ""
+
 
         # TODO(Part 1.3): Make the `execute` and `send_message` tools available
         # to the agent.

@@ -38,3 +38,7 @@ the effects of taking an action on the board. Write Python code that uses simula
 for a good move to play at this state. You can write more complex search procedures with lookahead
 and complex logic to choose the move. Once you have chosen a move, write a call to play_move at
 the end of the Python code snippet to actually play that move."""
+
+CODING_AGENT_SYSTEM_PROMPT_TEMPLATE = Template(
+    """You are a software engineer fixing a bug in a codebase."""
+)
